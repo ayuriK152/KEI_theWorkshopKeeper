@@ -9,6 +9,7 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 channelCsv = pd.read_csv('ChannelList.csv', encoding='UTF-8')
 reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
+watingRoleCsv = pd.read_csv('WaitingRoleList.csv', encoding='UTF-8')
 keiActivity = discord.Game('점검')
 
 
@@ -90,7 +91,6 @@ async def add_role(ctx, *args):
 async def on_raw_reaction_add(ctx):
     if ctx.member.bot:
         return
-    
     guild = bot.get_guild(ctx.guild_id)
     channelId = channelCsv[channelCsv['guild_id']==numpy.int64(ctx.guild_id)]['channel_id'].values
     messageId = reactionMsgCsv[reactionMsgCsv['message_id']==numpy.int64(ctx.message_id)]['message_id'].values
@@ -101,14 +101,24 @@ async def on_raw_reaction_add(ctx):
         print('messageId.size == 0')
         return
     
-    channel = guild.get_channel(channelId[0])
-    role = guild.get_role(reactionMsgCsv[reactionMsgCsv['message_id']==numpy.int64(ctx.message_id)]['role_id'].values[0])
-    if str(ctx.emoji.name) == '✅':
-        await channel.get_partial_message(ctx.message_id).remove_reaction('✅', ctx.member)
-        await ctx.member.add_roles(role)
-    elif str(ctx.emoji.name) == '❌':
-        await channel.get_partial_message(ctx.message_id).remove_reaction('❌', ctx.member)
-        await ctx.member.remove_roles(role)
+    for i in range(channelId.size):
+        try:
+            channel = guild.get_channel(channelId[i])
+            role = guild.get_role(reactionMsgCsv[reactionMsgCsv['message_id']==numpy.int64(ctx.message_id)]['role_id'].values[0])
+            if str(ctx.emoji.name) == '✅':
+                await channel.get_partial_message(ctx.message_id).remove_reaction('✅', ctx.member)
+                await ctx.member.add_roles(role)
+            elif str(ctx.emoji.name) == '❌':
+                await channel.get_partial_message(ctx.message_id).remove_reaction('❌', ctx.member)
+                await ctx.member.remove_roles(role)
+            if guild.id in watingRoleCsv['guild_id'].values:
+                watingRoleId = watingRoleCsv[watingRoleCsv['guild_id']==numpy.int64(guild.id)]['role_id'].values[0]
+                if guild.get_role(watingRoleId) in ctx.member.roles:
+                    await ctx.member.remove_roles(guild.get_role(watingRoleId))
+            break
+        except:
+            continue
+
 
 
 async def init():
@@ -118,7 +128,7 @@ async def init():
         channel = guild.get_channel(channelIds[i])
         msgIds = reactionMsgCsv[reactionMsgCsv['channel_id']==numpy.int64(channelIds[i])]['message_id'].values
         for j in range(msgIds.size):
-            await channel.get_partial_message(msgIds[i]).add_reaction('✅')
-            await channel.get_partial_message(msgIds[i]).add_reaction('❌')
+            await channel.get_partial_message(msgIds[j]).add_reaction('✅')
+            await channel.get_partial_message(msgIds[j]).add_reaction('❌')
 
 bot.run(open('TOKEN.txt', "r").read())
