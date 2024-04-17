@@ -102,6 +102,8 @@ async def add_role(ctx, *args):
     guild = bot.get_guild(guildId)
     channel = guild.get_channel(channelId)
 
+    print(channel.get_partial_message(inputMsgId))
+    
     await channel.get_partial_message(inputMsgId).add_reaction('✅')
     await channel.get_partial_message(inputMsgId).add_reaction('❌')
     await ctx.send(f'{args[0]} {args[1]}: 해당 메세지와 역할을 역할자판기에 등록했습니다.')
