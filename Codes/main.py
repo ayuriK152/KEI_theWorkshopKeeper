@@ -7,12 +7,10 @@ import os
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents=intents)
-# workingDir = os.getcwd()+'\\Codes\\'
-workingDir = os.getcwd()+'/'
 
-channelCsv = pd.read_csv(workingDir+'ChannelList.csv', encoding='UTF-8')
-reactionMsgCsv = pd.read_csv(workingDir+'ReactionMsgLists.csv', encoding='UTF-8')
-watingRoleCsv = pd.read_csv(workingDir+'WaitingRoleList.csv', encoding='UTF-8')
+channelCsv = pd.read_csv('ChannelList.csv', encoding='UTF-8')
+reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
+watingRoleCsv = pd.read_csv('WaitingRoleList.csv', encoding='UTF-8')
 keiActivity = discord.Game('정상작동')
 
 
@@ -62,7 +60,7 @@ async def register_role_channel(ctx, *args):
         return
     
     channelCsv = pd.concat([channelCsv, pd.DataFrame({'guild_id' : [ctx.guild.id], 'channel_id' : [args[0][2:-1]]})])
-    channelCsv.to_csv(workingDir+'ChannelList.csv', mode='w', index=None)
+    channelCsv.to_csv('ChannelList.csv', mode='w', index=None)
     await ctx.send(f'{args[0]}: 해당 채널을 역할자판기 채널로 등록했습니다.')
 
 
@@ -97,13 +95,15 @@ async def add_role(ctx, *args):
         return
     
     print(reactionMsgCsv)
-    pd.concat([reactionMsgCsv, pd.DataFrame({'channel_id' : [channelId], 'message_id' : [inputMsgId], 'role_id' : [inputRoleId]})]).to_csv(workingDir+'ReactionMsgLists.csv', mode='w', index=None)
-    reactionMsgCsv = pd.read_csv(workingDir+'ReactionMsgLists.csv', encoding='UTF-8')
+    pd.concat([reactionMsgCsv, pd.DataFrame({'channel_id' : [channelId], 'message_id' : [inputMsgId], 'role_id' : [inputRoleId]})]).to_csv('ReactionMsgLists.csv', mode='w', index=None)
+    reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
     print(reactionMsgCsv)
 
     guild = bot.get_guild(guildId)
     channel = guild.get_channel(channelId)
 
+    print(channel.get_partial_message(inputMsgId))
+    
     await channel.get_partial_message(inputMsgId).add_reaction('✅')
     await channel.get_partial_message(inputMsgId).add_reaction('❌')
     await ctx.send(f'{args[0]} {args[1]}: 해당 메세지와 역할을 역할자판기에 등록했습니다.')
