@@ -10,7 +10,7 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 channelCsv = pd.read_csv('ChannelList.csv', encoding='UTF-8')
 reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
 watingRoleCsv = pd.read_csv('WaitingRoleList.csv', encoding='UTF-8')
-keiActivity = discord.Game('점검')
+keiActivity = discord.Game('정상작동중')
 
 
 async def command_param_count(ctx, len, min, max):
@@ -26,15 +26,24 @@ async def command_param_count(ctx, len, min, max):
 @bot.event
 async def on_ready():
     print('케이짱 등장')
-    await bot.change_presence(status=discord.Status.do_not_disturb, activity=keiActivity)
+    await bot.change_presence(status=discord.Status.online, activity=keiActivity)
     await init()
 
 
+# 도움말 (추가 예정)
+@bot.command(name="명령어")
+async def help():
+    print("안녕이나 치세요")
+
+
+# 잡다한 명령어는 다 여기다가
 @bot.command(name="안녕")
 async def hello(ctx):
     await ctx.send('안녕하세요')
 
 
+# 여기부터 어드민 전용 기능들, 도움말에 사용법이 노출되어선 안됨
+# 명령어 입력한 사람이 어드민인지 확인하는 기능도 있어야할듯
 @bot.command(name='역할자판기-채널등록')
 async def register_role_channel(ctx, *args):
     global channelCsv
@@ -54,6 +63,7 @@ async def register_role_channel(ctx, *args):
     await ctx.send(f'{args[0]}: 해당 채널을 역할자판기 채널로 등록했습니다.')
 
 
+# 역할자판기 메세지 할당 메소드
 @bot.command(name='역할자판기-추가')
 async def add_role(ctx, *args):
     global reactionMsgCsv, channelCsv
@@ -95,6 +105,7 @@ async def add_role(ctx, *args):
     await channel.get_partial_message(inputMsgId).add_reaction('❌')
     await ctx.send(f'{args[0]} {args[1]}: 해당 메세지와 역할을 역할자판기에 등록했습니다.')
 
+
 # 이모지 반응 역할 부여 메소드
 @bot.event
 async def on_raw_reaction_add(ctx):
@@ -133,7 +144,7 @@ async def on_raw_reaction_add(ctx):
             continue
 
 
-
+# 봇 초기화 메소드, 시작할 때 한 번 실행
 async def init():
     channelIds = channelCsv['channel_id'].values
     for i in range(channelIds.size):
