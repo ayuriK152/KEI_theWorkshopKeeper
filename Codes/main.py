@@ -7,7 +7,7 @@ import os
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents=intents)
-#workingDir = os.getcwd()+'\\Codes\\'
+# workingDir = os.getcwd()+'\\Codes\\'
 workingDir = os.getcwd()+'/'
 
 channelCsv = pd.read_csv(workingDir+'ChannelList.csv', encoding='UTF-8')
@@ -57,12 +57,12 @@ async def register_role_channel(ctx, *args):
     if await command_param_count(ctx, len(args), 1, 1) != 0:
         return
     
-    if channelCsv[channelCsv['channel_id'] == numpy.int64(args[0][2:-1])]['channel_id'].values[0] != None:
+    if channelCsv[channelCsv['channel_id'] == numpy.int64(args[0][2:-1])]['channel_id'].values.size != 0:
         await ctx.send(f'{args[0]}: 해당 채널은 이미 역할자판기 채널로 등록되어있습니다.')
         return
     
     channelCsv = pd.concat([channelCsv, pd.DataFrame({'guild_id' : [ctx.guild.id], 'channel_id' : [args[0][2:-1]]})])
-    channelCsv.to_csv('ChannelList.csv', mode='w', index=None)
+    channelCsv.to_csv(workingDir+'ChannelList.csv', mode='w', index=None)
     await ctx.send(f'{args[0]}: 해당 채널을 역할자판기 채널로 등록했습니다.')
 
 
@@ -97,8 +97,8 @@ async def add_role(ctx, *args):
         return
     
     print(reactionMsgCsv)
-    pd.concat([reactionMsgCsv, pd.DataFrame({'channel_id' : [channelId], 'message_id' : [inputMsgId], 'role_id' : [inputRoleId]})]).to_csv('ReactionMsgLists.csv', mode='w', index=None)
-    reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
+    pd.concat([reactionMsgCsv, pd.DataFrame({'channel_id' : [channelId], 'message_id' : [inputMsgId], 'role_id' : [inputRoleId]})]).to_csv(workingDir+'ReactionMsgLists.csv', mode='w', index=None)
+    reactionMsgCsv = pd.read_csv(workingDir+'ReactionMsgLists.csv', encoding='UTF-8')
     print(reactionMsgCsv)
 
     guild = bot.get_guild(guildId)
