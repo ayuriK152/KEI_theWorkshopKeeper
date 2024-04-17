@@ -2,15 +2,17 @@ import discord
 from discord.ext import commands
 import pandas as pd
 import numpy
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents=intents)
+workingDir = os.getcwd()+'\\Codes\\'
 
-channelCsv = pd.read_csv('ChannelList.csv', encoding='UTF-8')
-reactionMsgCsv = pd.read_csv('ReactionMsgLists.csv', encoding='UTF-8')
-watingRoleCsv = pd.read_csv('WaitingRoleList.csv', encoding='UTF-8')
-keiActivity = discord.Game('정상작동중')
+channelCsv = pd.read_csv(workingDir+'ChannelList.csv', encoding='UTF-8')
+reactionMsgCsv = pd.read_csv(workingDir+'ReactionMsgLists.csv', encoding='UTF-8')
+watingRoleCsv = pd.read_csv(workingDir+'WaitingRoleList.csv', encoding='UTF-8')
+keiActivity = discord.Game('정상작동')
 
 
 async def command_param_count(ctx, len, min, max):
@@ -32,8 +34,8 @@ async def on_ready():
 
 # 도움말 (추가 예정)
 @bot.command(name="명령어")
-async def help():
-    print("안녕이나 치세요")
+async def help(ctx):
+    await ctx.send('안녕이나 치세요')
 
 
 # 잡다한 명령어는 다 여기다가
