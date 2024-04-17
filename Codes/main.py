@@ -7,7 +7,8 @@ import os
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents=intents)
-workingDir = os.getcwd()+'\\Codes\\'
+#workingDir = os.getcwd()+'\\Codes\\'
+workingDir = os.getcwd()+'/'
 
 channelCsv = pd.read_csv(workingDir+'ChannelList.csv', encoding='UTF-8')
 reactionMsgCsv = pd.read_csv(workingDir+'ReactionMsgLists.csv', encoding='UTF-8')
